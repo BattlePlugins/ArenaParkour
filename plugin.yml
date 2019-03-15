@@ -1,0 +1,9 @@
+name: ${project.name}
+version: ${project.version}
+main: mc.arena.parkour.Parkour
+authors: [MCForger, alkarin]
+description: Parkour plugin for BattleArena.
+depend: [BattleArena]
+commands:
+    parkour:
+        aliases: [pa, pk]

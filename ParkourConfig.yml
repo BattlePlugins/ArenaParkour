@@ -1,0 +1,42 @@
+Parkour:
+  name: Parkour
+  command: pk
+  prefix: '&6[Parkour]&e'
+  gameSize:
+    nTeams: 1+
+    teamSize: '1'
+  nLives: infinite
+  victoryCondition: CUSTOM
+  times:
+    matchTime: 120
+  tracking:
+    database: Parkour
+    rated: true
+    useTrackerMessages: false
+  arenaType: Parkour
+  arenaClass: ParkourArena
+  onEnter:
+    options:
+    - storeAll
+  onLeave:
+    options:
+    - restoreAll
+  onStart:
+    options:
+    - teleportIn
+    - pvpOn
+  onComplete:
+    options:
+    - teleportOut
+    - clearInventory
+  onSpawn:
+    options:
+    - health=20.0
+    - hunger=20
+  onDeath:
+    options:
+    - respawn
+  winners:
+    options:
+    - health=20.0
+    - hunger=20
