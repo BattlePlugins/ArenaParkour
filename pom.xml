@@ -111,8 +111,14 @@
     </build>
     <distributionManagement>
         <repository>
-            <id>rainbowcraft-repo</id>
-            <url>scp://rainbowcraft.sytes.net/var/www/maven/repository</url>
+            <id>central</id>
+            <name>BattlePlugins Maven Server-releases</name>
+            <url>https://repo.battleplugins.org/artifactory/libs-release-local</url>
         </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>BattlePlugins Maven Server-snapshots</name>
+            <url>https://repo.battleplugins.org/artifactory/libs-snapshot-local</url>
+        </snapshotRepository>
     </distributionManagement>
 </project>
