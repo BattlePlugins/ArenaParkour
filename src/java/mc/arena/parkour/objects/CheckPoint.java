@@ -2,7 +2,8 @@ package mc.arena.parkour.objects;
 
 import java.util.HashMap;
 import java.util.Map;
-import mc.alk.arena.objects.regions.ArenaRegion;
+
+import mc.alk.arena.alib.arenaregenutil.region.ArenaRegion;
 import mc.alk.arena.objects.regions.BoundingBox;
 import mc.alk.arena.util.SerializerUtil;
 import org.bukkit.Location;
@@ -59,7 +60,8 @@ public class CheckPoint extends BoundingBox implements ArenaRegion {
         return map;
     }
 
-    public boolean valid() {
+    @Override
+    public boolean isValid() {
         return (this.upper != null) && (this.lower != null) && (this.spawnPoint != null);
     }
 

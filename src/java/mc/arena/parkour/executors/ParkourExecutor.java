@@ -28,7 +28,7 @@ public class ParkourExecutor extends CustomCommandExecutor {
         }
         ParkourArena pa = (ParkourArena)arena;
         try {
-            pa.addCheckPoint(sender.getPlayer(), index - 1, sender.getLocation(), Boolean.valueOf(false));
+            pa.addCheckPoint(sender.getPlayer(), index - 1, false);
         } catch (Exception e) {
             MessageUtil.sendMessage(sender, e.getMessage());
             return true;
@@ -58,7 +58,7 @@ public class ParkourExecutor extends CustomCommandExecutor {
         }
         ParkourArena pa = (ParkourArena)arena;
         try {
-            pa.addVictoryPoint(sender.getPlayer(), index.intValue() - 1, sender.getLocation(), Boolean.valueOf(true));
+            pa.addVictoryPoint(sender.getPlayer(), index.intValue() - 1,  true);
         } catch (Exception e) {
             MessageUtil.sendMessage(sender, e.getMessage());
             return true;

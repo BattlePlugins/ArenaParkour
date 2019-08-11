@@ -6,9 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.sk89q.worldedit.regions.Region;
-import mc.alk.arena.alib.worldeditutil.controllers.WorldGuardController;
-import mc.alk.arena.alib.worldeditutil.math.BlockSelection;
+import mc.alk.arena.alib.arenaregenutil.ArenaRegenController;
+import mc.alk.arena.alib.arenaregenutil.region.ArenaSelection;
 import mc.alk.arena.objects.MatchState;
 import mc.alk.arena.objects.arenas.Arena;
 import mc.alk.arena.objects.events.ArenaEventHandler;
@@ -21,7 +20,6 @@ import mc.arena.parkour.events.ArrivedAtVictoryPointEvent;
 import mc.arena.parkour.objects.CheckPoint;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -32,7 +30,7 @@ public class ParkourArena extends Arena {
     List<CheckPoint> checkPoints = new CopyOnWriteArrayList();
     @Persist
     List<CheckPoint> victoryCheckPoints = new CopyOnWriteArrayList();
-    int mainThreadID;
+
     static Map<ArenaTeam, CheckPoint> teamCheckPoints = new HashMap();
 
     public void onOpen() {
@@ -124,9 +122,8 @@ public class ParkourArena extends Arena {
         teamCheckPoints.put(team, checkPoint);
     }
 
-    public void addCheckPoint(Player p, int i, Location location, Boolean bool)  {
-        Region weRegion = WorldGuardController.getWorldEditRegion(p);
-        BlockSelection sel = WorldGuardController.getBlockSelection(weRegion);
+    public void addCheckPoint(Player p, int i, Boolean bool)  {
+        ArenaSelection sel = ArenaRegenController.getSelection(p);
         if (sel == null) {
             throw new IllegalStateException(ChatColor.RED + "Please select an area first using WorldEdit.");
         }
@@ -140,9 +137,8 @@ public class ParkourArena extends Arena {
         }
     }
 
-    public void addVictoryPoint(Player p, int i, Location location, Boolean bool) {
-        Region weRegion = WorldGuardController.getWorldEditRegion(p);
-        BlockSelection sel = WorldGuardController.getBlockSelection(weRegion);
+    public void addVictoryPoint(Player p, int i, Boolean bool) {
+        ArenaSelection sel = ArenaRegenController.getSelection(p);
         if (sel == null) {
             throw new IllegalStateException(ChatColor.RED + "Please select an area first using WorldEdit.");
         }
