@@ -1,6 +1,5 @@
 package mc.arena.parkour;
 
-import java.util.logging.Logger;
 import mc.alk.arena.BattleArena;
 import mc.arena.parkour.arena.ParkourArena;
 import mc.arena.parkour.executors.ParkourExecutor;

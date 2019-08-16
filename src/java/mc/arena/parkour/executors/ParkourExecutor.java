@@ -64,7 +64,7 @@ public class ParkourExecutor extends CustomCommandExecutor {
             return true;
         }
         BattleArena.saveArenas(Parkour.getSelf());
-        return sendMessage(sender, "&2Victory &6" + index + "&2 added!");
+        return sendMessage(sender, "&2Victory point &6" + index + "&2 added!");
     }
 
     @MCCommand(cmds={"clearVictoryPoints", "cvp"}, admin=true)

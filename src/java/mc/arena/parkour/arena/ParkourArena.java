@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import mc.alk.arena.alib.arenaregenutil.ArenaRegenController;
 import mc.alk.arena.alib.arenaregenutil.region.ArenaSelection;
+import mc.alk.arena.alib.battlebukkitlib.PlayerUtil;
 import mc.alk.arena.objects.MatchState;
 import mc.alk.arena.objects.arenas.Arena;
 import mc.alk.arena.objects.events.ArenaEventHandler;
@@ -15,6 +17,8 @@ import mc.alk.arena.objects.events.EventPriority;
 import mc.alk.arena.objects.teams.ArenaTeam;
 import mc.alk.arena.serializers.Persist;
 import mc.alk.arena.util.Log;
+import mc.alk.arena.util.TimeUtil;
+import mc.arena.parkour.Parkour;
 import mc.arena.parkour.events.ArrivedAtCheckPointEvent;
 import mc.arena.parkour.events.ArrivedAtVictoryPointEvent;
 import mc.arena.parkour.objects.CheckPoint;
@@ -23,6 +27,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.scheduler.BukkitTask;
 
 public class ParkourArena extends Arena {
 
@@ -33,6 +38,9 @@ public class ParkourArena extends Arena {
     protected List<CheckPoint> victoryCheckPoints = new CopyOnWriteArrayList<>();
 
     private Map<ArenaTeam, CheckPoint> teamCheckPoints = new HashMap<>();
+    private Map<UUID, Long> startTimes = new HashMap<>();
+
+    private BukkitTask timerTask;
 
     public void onOpen() {
         try {
@@ -46,12 +54,37 @@ public class ParkourArena extends Arena {
         teamCheckPoints.clear();
     }
 
-    public void onFinish() {}
+    @Override
+    protected void onComplete() {
+        timerTask.cancel();
+        startTimes.clear();
+    }
+
+    @Override
+    protected void onCancel() {
+        timerTask.cancel();
+        startTimes.clear();
+    }
 
     private void localInit() {
         if ((this.victoryCheckPoints == null) || (this.victoryCheckPoints.isEmpty())) {
             Log.err("[ParkourArena] " + getName() + " is missing victory points! please reset them");
         }
+
+        for (UUID player : players) {
+            startTimes.put(player, System.currentTimeMillis());
+        }
+
+        timerTask = Bukkit.getScheduler().runTaskTimerAsynchronously(Parkour.getSelf(), () -> {
+            for (UUID uuid : players) {
+                Player player = Bukkit.getPlayer(uuid);
+                if (player == null || !player.isOnline())
+                    continue;
+
+                String time = TimeUtil.convertMillisToString(startTimes.get(uuid));
+                PlayerUtil.sendActionBarText(player, ChatColor.GOLD + "Parkour time: " + ChatColor.YELLOW + time);
+            }
+        }, 20, 20);
     }
 
     @ArenaEventHandler

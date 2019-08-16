@@ -4,11 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import mc.alk.arena.alib.arenaregenutil.region.ArenaRegion;
+import mc.alk.arena.objects.YamlSerializable;
 import mc.alk.arena.objects.regions.BoundingBox;
 import mc.alk.arena.util.SerializerUtil;
 import org.bukkit.Location;
 
-public class CheckPoint extends BoundingBox implements ArenaRegion {
+public class CheckPoint extends BoundingBox implements ArenaRegion, YamlSerializable {
 
     private Location spawnPoint;
     private boolean victoryPoint;
@@ -39,7 +40,8 @@ public class CheckPoint extends BoundingBox implements ArenaRegion {
         this.spawnPoint = loc;
     }
 
-    public Object yamlToObject(Map<String, Object> map, String value) {
+    @Override
+    public CheckPoint yamlToObject(Map<String, Object> map, String value) {
         Location tc = SerializerUtil.getLocation((String)map.get("topCorner"));
         Location bc = SerializerUtil.getLocation((String)map.get("bottomCorner"));
 
@@ -50,7 +52,8 @@ public class CheckPoint extends BoundingBox implements ArenaRegion {
         return new CheckPoint(tc, bc, sp, number, bool);
     }
 
-    public Object objectToYaml() {
+    @Override
+    public Map<String, String> objectToYaml() {
         Map<String, String> map = new HashMap<>();
         map.put("topCorner", SerializerUtil.getLocString(this.upper));
         map.put("bottomCorner", SerializerUtil.getLocString(this.lower));
@@ -67,10 +70,6 @@ public class CheckPoint extends BoundingBox implements ArenaRegion {
 
     public String getID() {
         return super.hashCode() + "";
-    }
-
-    public String getWorldName() {
-        return null;
     }
 
     public int getNumber() {
