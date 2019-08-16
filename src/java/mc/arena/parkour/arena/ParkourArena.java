@@ -27,11 +27,12 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 public class ParkourArena extends Arena {
 
     @Persist
-    List<CheckPoint> checkPoints = new CopyOnWriteArrayList();
-    @Persist
-    List<CheckPoint> victoryCheckPoints = new CopyOnWriteArrayList();
+    protected List<CheckPoint> checkPoints = new CopyOnWriteArrayList<>();
 
-    static Map<ArenaTeam, CheckPoint> teamCheckPoints = new HashMap();
+    @Persist
+    protected List<CheckPoint> victoryCheckPoints = new CopyOnWriteArrayList<>();
+
+    private Map<ArenaTeam, CheckPoint> teamCheckPoints = new HashMap<>();
 
     public void onOpen() {
         try {
@@ -58,13 +59,13 @@ public class ParkourArena extends Arena {
         if (event.isCancelled()) {
             return;
         }
-        if (((event.getFrom().getBlockX() == event.getTo().getBlockX()) && (event.getFrom().getBlockY() == event.getTo().getBlockY()) && (event.getFrom().getBlockZ() == event.getTo().getBlockZ())) || (getMatchState() != MatchState.ONSTART)) {
+        if (((event.getFrom().getBlockX() == event.getTo().getBlockX()) && (event.getFrom().getBlockY() == event.getTo().getBlockY()) && (event.getFrom().getBlockZ() == event.getTo().getBlockZ())) || (getState() != MatchState.ONSTART)) {
             return;
         }
         for (CheckPoint checkPoint : this.checkPoints) {
             if (checkPoint.contains(event.getTo())) {
                 ArenaTeam t = getTeam(event.getPlayer());
-                CheckPoint oldCp = (CheckPoint)teamCheckPoints.get(t);
+                CheckPoint oldCp = teamCheckPoints.get(t);
                 if ((oldCp != null) && (oldCp.getNumber() >= checkPoint.getNumber())) {
                     break;
                 }
@@ -88,7 +89,7 @@ public class ParkourArena extends Arena {
                 if (arrivedEvent.isCancelled()) {
                     return;
                 }
-                arrivedAtVictoryPoint(arrivedEvent.getPlayer(), t, arrivedEvent.getCheckPoint());
+                arrivedAtVictoryPoint(t);
 
                 return;
             }
@@ -101,14 +102,14 @@ public class ParkourArena extends Arena {
         if (t == null) {
             return;
         }
-        CheckPoint cp = (CheckPoint)teamCheckPoints.get(t);
+        CheckPoint cp = teamCheckPoints.get(t);
         if (cp == null) {
             return;
         }
         event.setRespawnLocation(cp.getSpawnPoint());
     }
 
-    private void arrivedAtVictoryPoint(Player player, ArenaTeam team, CheckPoint checkPoint) {
+    private void arrivedAtVictoryPoint(ArenaTeam team) {
         setWinner(team);
     }
 
@@ -127,7 +128,7 @@ public class ParkourArena extends Arena {
         if (sel == null) {
             throw new IllegalStateException(ChatColor.RED + "Please select an area first using WorldEdit.");
         }
-        CheckPoint cp = new CheckPoint(sel.getMinimumPoint(), sel.getMaximumPoint(), p.getLocation(), i, bool.booleanValue());
+        CheckPoint cp = new CheckPoint(sel.getMinimumPoint(), sel.getMaximumPoint(), p.getLocation(), i, bool);
         if (i < this.checkPoints.size()) {
             this.checkPoints.set(i, cp);
         } else if (i == this.checkPoints.size()) {
@@ -142,7 +143,7 @@ public class ParkourArena extends Arena {
         if (sel == null) {
             throw new IllegalStateException(ChatColor.RED + "Please select an area first using WorldEdit.");
         }
-        CheckPoint cp = new CheckPoint(sel.getMinimumPoint(), sel.getMaximumPoint(), p.getLocation(), i, bool.booleanValue());
+        CheckPoint cp = new CheckPoint(sel.getMinimumPoint(), sel.getMaximumPoint(), p.getLocation(), i, bool);
         if (i < this.victoryCheckPoints.size()) {
             this.victoryCheckPoints.set(i, cp);
         } else if (i == this.victoryCheckPoints.size()) {
@@ -165,7 +166,7 @@ public class ParkourArena extends Arena {
     }
 
     public List<String> getInvalidReasons() {
-        List<String> reasons = new ArrayList();
+        List<String> reasons = new ArrayList<>();
         if ((this.victoryCheckPoints == null) || (this.victoryCheckPoints.isEmpty())) {
             reasons.add("You need to specify a victory point!");
         }
@@ -173,10 +174,10 @@ public class ParkourArena extends Arena {
     }
 
     public CheckPoint getTeamsCheckPoint(ArenaTeam team) {
-        return (CheckPoint)teamCheckPoints.get(team);
+        return teamCheckPoints.get(team);
     }
 
-    public CheckPoint getCheckPoint(Integer index) {
-        return (CheckPoint)this.checkPoints.get(index.intValue());
+    public CheckPoint getCheckPoint(int index) {
+        return this.checkPoints.get(index);
     }
 }

@@ -10,9 +10,9 @@ import org.bukkit.Location;
 
 public class CheckPoint extends BoundingBox implements ArenaRegion {
 
-    Location spawnPoint;
-    boolean victoryPoint;
-    int number;
+    private Location spawnPoint;
+    private boolean victoryPoint;
+    private int number;
 
     public CheckPoint() {}
 
@@ -45,13 +45,13 @@ public class CheckPoint extends BoundingBox implements ArenaRegion {
 
         Location sp = SerializerUtil.getLocation((String)map.get("spawnPoint"));
 
-        boolean bool = Boolean.valueOf(map.get("isVictoryPoint").toString()).booleanValue();
-        int number = Integer.valueOf(map.get("number").toString()).intValue();
+        boolean bool = Boolean.parseBoolean(map.get("isVictoryPoint").toString());
+        int number = Integer.parseInt(map.get("number").toString());
         return new CheckPoint(tc, bc, sp, number, bool);
     }
 
     public Object objectToYaml() {
-        Map<String, String> map = new HashMap();
+        Map<String, String> map = new HashMap<>();
         map.put("topCorner", SerializerUtil.getLocString(this.upper));
         map.put("bottomCorner", SerializerUtil.getLocString(this.lower));
         map.put("spawnPoint", SerializerUtil.getLocString(this.spawnPoint));

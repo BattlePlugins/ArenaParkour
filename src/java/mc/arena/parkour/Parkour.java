@@ -9,12 +9,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Parkour extends JavaPlugin {
 
-    Logger log = Logger.getLogger("Minecraft");
     private String logName = ChatColor.DARK_RED + "[Error]";
-    static Parkour plugin;
+    private static Parkour plugin;
 
     public void onDisable()  {
-        this.log.info(this.logName + " Has disabled!");
+        getLogger().info(this.logName + " Has disabled!");
     }
 
     public void onEnable() {
@@ -23,17 +22,10 @@ public class Parkour extends JavaPlugin {
         BattleArena.registerCompetition(this, "Parkour", "PA", ParkourArena.class, new ParkourExecutor());
 
         reloadConfig();
-        this.log.info(this.logName + " Has enabled running version " + getDescription().getVersion());
+        getLogger().info(this.logName + " Has enabled running version " + getDescription().getVersion());
     }
 
     public static Parkour getSelf() {
         return plugin;
     }
-
-    public void reloadConfig() {
-        super.reloadConfig();
-        loadConfig();
-    }
-
-    public void loadConfig() {}
 }

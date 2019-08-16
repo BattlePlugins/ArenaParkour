@@ -7,14 +7,15 @@ import org.bukkit.event.HandlerList;
 public class ParkourEvent extends Event implements Cancellable {
 
     private HandlerList handlers = new HandlerList();
-    private boolean bool = false;
+
+    private boolean cancelled = false;
 
     public boolean isCancelled() {
-        return this.bool;
+        return cancelled;
     }
 
-    public void setCancelled(boolean bool) {
-        this.bool = bool;
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
     }
 
     public HandlerList getHandlers() {
