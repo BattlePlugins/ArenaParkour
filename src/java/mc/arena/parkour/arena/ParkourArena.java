@@ -10,13 +10,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import mc.alk.arena.alib.arenaregenutil.ArenaRegenController;
 import mc.alk.arena.alib.arenaregenutil.region.ArenaSelection;
 import mc.alk.arena.alib.battlebukkitlib.PlayerUtil;
-import mc.alk.arena.objects.MatchState;
+import mc.alk.arena.alib.bukkitadapter.SoundAdapter;
+import mc.alk.arena.objects.ArenaPlayer;
 import mc.alk.arena.objects.arenas.Arena;
 import mc.alk.arena.objects.events.ArenaEventHandler;
 import mc.alk.arena.objects.events.EventPriority;
 import mc.alk.arena.objects.teams.ArenaTeam;
 import mc.alk.arena.serializers.Persist;
 import mc.alk.arena.util.Log;
+import mc.alk.arena.util.MessageUtil;
 import mc.alk.arena.util.TimeUtil;
 import mc.arena.parkour.Parkour;
 import mc.arena.parkour.events.ArrivedAtCheckPointEvent;
@@ -40,6 +42,8 @@ public class ParkourArena extends Arena {
     private Map<ArenaTeam, CheckPoint> teamCheckPoints = new HashMap<>();
     private Map<UUID, Long> startTimes = new HashMap<>();
 
+    private boolean victorChosen;
+
     private BukkitTask timerTask;
 
     public void onOpen() {
@@ -55,9 +59,24 @@ public class ParkourArena extends Arena {
     }
 
     @Override
+    protected void onStart() {
+        timerTask = Bukkit.getScheduler().runTaskTimerAsynchronously(Parkour.getSelf(), () -> {
+            for (Player player : getAliveBukkitPlayers()) {
+                String time = TimeUtil.convertMillisToString(System.currentTimeMillis() - startTimes.get(player.getUniqueId()));
+                PlayerUtil.sendActionBarText(player, ChatColor.GOLD + "Parkour time: " + ChatColor.YELLOW + MessageUtil.decolorChat(MessageUtil.colorChat(time)));
+            }
+        }, 20, 20);
+    }
+
+    @Override
     protected void onComplete() {
         timerTask.cancel();
         startTimes.clear();
+    }
+
+    @Override
+    protected void onEnter(ArenaPlayer player, ArenaTeam team) {
+        startTimes.put(player.getID(), System.currentTimeMillis());
     }
 
     @Override
@@ -71,20 +90,10 @@ public class ParkourArena extends Arena {
             Log.err("[ParkourArena] " + getName() + " is missing victory points! please reset them");
         }
 
-        for (UUID player : players) {
-            startTimes.put(player, System.currentTimeMillis());
+        victorChosen = false;
+        for (Player player : getAliveBukkitPlayers()) {
+            startTimes.put(player.getUniqueId(), System.currentTimeMillis());
         }
-
-        timerTask = Bukkit.getScheduler().runTaskTimerAsynchronously(Parkour.getSelf(), () -> {
-            for (UUID uuid : players) {
-                Player player = Bukkit.getPlayer(uuid);
-                if (player == null || !player.isOnline())
-                    continue;
-
-                String time = TimeUtil.convertMillisToString(startTimes.get(uuid));
-                PlayerUtil.sendActionBarText(player, ChatColor.GOLD + "Parkour time: " + ChatColor.YELLOW + time);
-            }
-        }, 20, 20);
     }
 
     @ArenaEventHandler
@@ -92,7 +101,7 @@ public class ParkourArena extends Arena {
         if (event.isCancelled()) {
             return;
         }
-        if (((event.getFrom().getBlockX() == event.getTo().getBlockX()) && (event.getFrom().getBlockY() == event.getTo().getBlockY()) && (event.getFrom().getBlockZ() == event.getTo().getBlockZ())) || (getState() != MatchState.ONSTART)) {
+        if (((event.getFrom().getBlockX() == event.getTo().getBlockX()) && (event.getFrom().getBlockY() == event.getTo().getBlockY()) && (event.getFrom().getBlockZ() == event.getTo().getBlockZ()))) {
             return;
         }
         for (CheckPoint checkPoint : this.checkPoints) {
@@ -143,20 +152,26 @@ public class ParkourArena extends Arena {
     }
 
     private void arrivedAtVictoryPoint(ArenaTeam team) {
+        if (victorChosen)
+            return;
+
         setWinner(team);
+        victorChosen = true;
     }
 
     private void arrivedAtCheckPoint(Player player, ArenaTeam team, CheckPoint checkPoint) {
         int i = checkPoint.getNumber();
         if (team.size() > 1) {
-            team.sendMessage("&6" + player.getName() + "&e made it to check point &6" + (i + 1));
+            team.sendMessage("&6" + player.getName() + "&e made it to check point &6#" + (i + 1) + "&e!");
         } else {
-            team.sendMessage("&eYou made it to check point &6" + (i + 1));
+            team.sendMessage("&eYou made it to check point &6#" + (i + 1) + "&e!");
         }
+
+        player.playSound(player.getLocation(), SoundAdapter.getSound("LEVEL_UP"), 1f, 1f);
         teamCheckPoints.put(team, checkPoint);
     }
 
-    public void addCheckPoint(Player p, int i, Boolean bool)  {
+    public void addCheckPoint(Player p, int i, boolean bool)  {
         ArenaSelection sel = ArenaRegenController.getSelection(p);
         if (sel == null) {
             throw new IllegalStateException(ChatColor.RED + "Please select an area first using WorldEdit.");
@@ -171,7 +186,7 @@ public class ParkourArena extends Arena {
         }
     }
 
-    public void addVictoryPoint(Player p, int i, Boolean bool) {
+    public void addVictoryPoint(Player p, int i, boolean bool) {
         ArenaSelection sel = ArenaRegenController.getSelection(p);
         if (sel == null) {
             throw new IllegalStateException(ChatColor.RED + "Please select an area first using WorldEdit.");
