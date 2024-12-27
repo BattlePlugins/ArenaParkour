@@ -80,11 +80,11 @@ public class ParkourArena extends Arena {
 
             if (parkourMap.isFinalCheckpoint(pos)) {
                 this.getEventManager().callEvent(new ParkourCompleteEvent(this, player));
-            } else if (!initial) {
-                this.getEventManager().callEvent(new ParkourCheckpointEvent(this, player, checkpointNumber - 1));
 
                 player.removeMetadata(StartTime.class);
                 player.removeMetadata(LastPosition.class);
+            } else if (!initial) {
+                this.getEventManager().callEvent(new ParkourCheckpointEvent(this, player, checkpointNumber - 1));
             }
         }
     }
