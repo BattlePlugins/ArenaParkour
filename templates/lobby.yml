@@ -1,0 +1,45 @@
+# A lobby parkour. Players can join and leave at any time, and are
+# placed in the parkour when they enter the game region.
+name: Parkour
+type: Match
+team-options:
+  named-teams: false
+  team-size: 1
+  team-amount: 2+
+  team-selection: none
+  shared-spawn-points: true
+modules:
+  - auto-arena
+lives:
+  enabled: false
+events:
+  on-join:
+    - store{types=gamemode,effects}
+    - change-gamemode{gamemode=adventure}
+    - flight{enabled=false}
+  on-spectate:
+    - change-gamemode{gamemode=spectator}
+    - flight{enabled=true}
+    - teleport{location=spectator}
+  on-leave:
+    - restore{types=gamemode,effects}
+  on-parkour-checkpoint:
+    - send-message{message=<green>Checkpoint <gold>#%checkpoint_number%</gold> reached!</green>}
+    - play-sound{sound=entity.experience_orb.pickup;pitch=1;volume=1}
+  on-parkour-complete:
+    - send-message{message=<green>Congrats, you completed the parkour in %time_elapsed%!</green>}
+    - play-sound{sound=entity.player.levelup;pitch=1;volume=1}
+options:
+  - block-break{enabled=false}
+  - block-place{enabled=false}
+  - block-interact{enabled=false}
+  - hunger-deplete{enabled=false}
+  - damage-players{option=never}
+  - damage-entities{option=never}
+  - keep-inventory{enabled=true}
+  - keep-experience{enabled=true}
+initial-phase: ingame
+phases:
+  ingame:
+    allow-join: true
+    allow-spectate: false

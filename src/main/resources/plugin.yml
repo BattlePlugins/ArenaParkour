@@ -1,0 +1,8 @@
+name: ArenaParkour
+main: org.battleplugins.arena.parkour.ArenaParkour
+version: ${version}
+description: A parkour mode for BattleArena.
+author: BattlePlugins
+website: https://battleplugins.org
+api-version: 1.19
+depend: [BattleArena]

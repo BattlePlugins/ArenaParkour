@@ -1,0 +1,13 @@
+# -----------------
+# Main configuration for ArenaParkour
+#
+# Documentation: https://docs.battleplugins.org/books/additional-gamemodes/chapter/parkour
+# Support: https://discord.gg/tMVPVJf
+# GitHub: https://github.com/BattlePlugins/ArenaParkour
+# -----------------
+config-version: 2.0 # The config version, do not change!
+
+# Whether a hologram should appear above each checkpoint
+# indicating the checkpoint number. Requires that a hologram
+# plugin is installed (i.e. FancyHolograms, DecentHolograms).
+display-checkpoint-holograms: true
