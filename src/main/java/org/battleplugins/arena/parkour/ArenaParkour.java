@@ -7,6 +7,8 @@ import org.battleplugins.arena.config.ParseException;
 import org.battleplugins.arena.event.ArenaEventType;
 import org.battleplugins.arena.parkour.event.ParkourCheckpointEvent;
 import org.battleplugins.arena.parkour.event.ParkourCompleteEvent;
+import org.battleplugins.arena.util.Version;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -27,6 +29,13 @@ public class ArenaParkour extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        Version version = Version.of(Bukkit.getPluginManager().getPlugin("BattleArena"));
+        if (version.isLessThan("4.0.1")) {
+            this.getSLF4JLogger().error("BattleArena version 4.0.1 or higher is required to run ArenaParkour! Disabling plugin.");
+            this.getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
         instance = this;
 
         this.saveDefaultConfig();
