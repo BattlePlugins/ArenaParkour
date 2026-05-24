@@ -60,22 +60,14 @@ public class ParkourArena extends Arena {
             return;
         }
 
-        boolean initial = false;
         int checkpointNumber = parkourMap.getCheckpointNumber(pos);
-        if (player.getMetadata(StartTime.class) == null) {
-            if (checkpointNumber == 1) {
-                player.setMetadata(StartTime.class, new StartTime(System.currentTimeMillis()));
-                initial = true;
-            } else {
-                // Don't process anything below, since we only want to start counting their
-                // time when they reach the first (start) checkpoint
-                return;
-            }
+        if (checkpointNumber == 1) {
+            player.setMetadata(StartTime.class, new StartTime(System.currentTimeMillis()));
         }
 
         // Only update the last position if the player has moved to a higher checkpoint
         LastPosition lastPosition = player.getMetadata(LastPosition.class);
-        if (lastPosition == null || lastPosition.getIndex() < checkpointNumber) {
+        if (lastPosition == null || lastPosition.getIndex() < checkpointNumber || checkpointNumber == 1) {
             player.setMetadata(LastPosition.class, new LastPosition(pos, System.currentTimeMillis(), checkpointNumber));
 
             if (parkourMap.isFinalCheckpoint(pos)) {
@@ -83,7 +75,7 @@ public class ParkourArena extends Arena {
 
                 player.removeMetadata(StartTime.class);
                 player.removeMetadata(LastPosition.class);
-            } else if (!initial) {
+            } else if (checkpointNumber != 1 && (lastPosition == null || lastPosition.getIndex() < checkpointNumber)) {
                 this.getEventManager().callEvent(new ParkourCheckpointEvent(this, player, checkpointNumber - 1));
             }
         }
